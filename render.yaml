@@ -1,0 +1,22 @@
+services:
+  - type: web
+    name: shofi-hosting
+    runtime: docker
+    plan: free
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: RENDER
+        value: "true"
+      - key: DB_PATH
+        value: /var/data/data.db
+      - key: SESSION_SECRET
+        generateValue: true
+      - key: ADMIN_USERNAME
+        sync: false
+      - key: ADMIN_PASSWORD
+        sync: false
+    disk:
+      name: shofi-data
+      mountPath: /var/data
+      sizeGB: 1

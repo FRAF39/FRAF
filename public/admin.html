@@ -1,0 +1,12 @@
+<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Admin Panel</title><link rel="stylesheet" href="/style.css"></head><body><header><b>SHOFI HOSTING — ADMIN</b><form method="post" action="/logout"><button>Logout</button></form></header>
+<main class="wrap"><section class="card"><h2>Create User</h2><div class="grid"><input id="username" placeholder="Username"><input id="password" placeholder="Password"><input id="expiresAt" type="datetime-local"><label><input id="active" type="checkbox" checked> Active</label><button onclick="createUser()">Create</button></div></section>
+<section class="card"><h2>Users</h2><div id="users"></div></section></main>
+<script>
+async function load(){const r=await fetch('/api/users');const u=await r.json();document.getElementById('users').innerHTML=u.map(x=>`<div class="user"><b>${esc(x.username)}</b><span>${x.expires_at?new Date(x.expires_at).toLocaleString():'No expiry'}</span><span>${x.active?'Active':'Disabled'}</span><button onclick="toggle(${x.id},${x.active?0:1})">${x.active?'Disable':'Enable'}</button>${x.username!=='admin'?`<button onclick="del(${x.id})">Delete</button>`:''}</div>`).join('')}
+async function createUser(){const body={username:username.value.trim(),password:password.value,expiresAt:expiresAt.value||null,active:active.checked};const r=await fetch('/api/users',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});const d=await r.json();if(!r.ok)return alert(d.error);username.value=password.value=expiresAt.value='';load()}
+async function toggle(id,active){await fetch('/api/users/'+id,{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({active})});load()}
+async function del(id){if(confirm('Delete this user?')){await fetch('/api/users/'+id,{method:'DELETE'});load()}}
+function esc(s){return s.replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+load();
+</script></body></html>
